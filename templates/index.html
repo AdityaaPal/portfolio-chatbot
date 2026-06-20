@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aditya's AI ChatBot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <span class="topbar-title">I'm Aditya's Assistant</span>
+      <div class="topbar-model">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Assistant-v1
+      </div>
+    </div>
+
+    <!-- Chat messages -->
+    <div id="chat-box">
+      <div class="empty-state" id="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <p>Ask anything about Aditya</p>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea
+          id="message"
+          placeholder="Ask anything about Aditya…"
+          rows="1"
+          autofocus
+        ></textarea>
+        <button id="send-btn" onclick="sendMessage()" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <p class="input-hint">Responses are AI-generated and may contain errors.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
