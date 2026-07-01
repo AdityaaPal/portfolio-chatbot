@@ -1,10 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 from rag.retriever import retrieve
-import ollama
+from groq import Groq
+import os
 
 app = Flask(__name__)
 
-_client = ollama.Client()
+# ✅ Groq client — fast cloud inference, free tier
+client = Groq(
+    api_key="api_key"  # replace with your actual API key
+)
+
+CONTACT_KEYWORDS = ["contact", "linkedin", "email", "reach", "mail", "connect", "gmail"]
+IDENTITY_KEYWORDS = ["who created you", "who made you", "what are you", "who are you", "who built you"]
 
 @app.route("/")
 def home():
@@ -14,6 +21,15 @@ def home():
 def chat():
 
     user_question = request.json["message"]
+
+    # ✅ contact intent — bypass model entirely
+    if any(word in user_question.lower() for word in CONTACT_KEYWORDS):
+        return jsonify({"answer": "You can reach Aditya through his contact details below.\n[CONTACT_CARD]"})
+
+    # ✅ identity intent — bypass model entirely
+    if any(phrase in user_question.lower() for phrase in IDENTITY_KEYWORDS):
+        return jsonify({"answer": "I'm an AI assistant built to help you learn about Aditya Pal. Ask me anything about his skills, experience, or projects!"})
+
     context = retrieve(user_question)
 
     prompt = f"""
@@ -30,8 +46,7 @@ Rules:
 - Never reference the context directly (don't say "according to the context" or "the document says").
 - Keep answers focused — avoid padding or filler sentences.
 - If someone asks something off-topic (unrelated to Aditya), politely redirect: "I'm here specifically to answer questions about Aditya Pal."
-- If the user asks for contact, email, LinkedIn, or how to reach Aditya, write one short sentence only, then on the very next line output exactly this token and nothing after it: [CONTACT_CARD]
-- Never write out URLs or email addresses directly in your response. Always use [CONTACT_CARD] instead.
+- Your entire response must be 3 sentences maximum. No exceptions. Stop after the 3rd sentence.
 
 Tone: Professional but conversational. Confident, not arrogant.
 
@@ -44,17 +59,15 @@ Question:
 Answer:
 """
 
-    response = _client.generate(
-        model="qwen2.5:1.5b",
-        prompt=prompt,
-        options={
-            "temperature": 0.3,
-            "num_predict": 200,
-            "num_ctx": 2048,
-        }
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",  # ✅ fast, free, smart — much better than qwen2.5:1.5b
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=180,
     )
 
-    return jsonify({"answer": response["response"]})
+    answer = response.choices[0].message.content
+    return jsonify({"answer": answer})
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(host="0.0.0.0", debug=False)
